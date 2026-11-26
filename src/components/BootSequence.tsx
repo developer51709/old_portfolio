@@ -9,14 +9,12 @@ const BOOT_LINES = [
   { text: 'Mounting /dev/creativity... OK', delay: 1000 },
   { text: 'Starting network interface... CONNECTED', delay: 1200 },
   { text: '', delay: 1500 },
-  { text: '', delay: 1550 },
-  { text: '', delay: 1600 },
-  { text: '', delay: 1650 },
-  { text: '', delay: 1700 },
+  { text: '  ___                   ', delay: 1550 },
+  { text: ' / __| ___ _ _ ___ _ _  ', delay: 1600 },
+  { text: ' \\__ \\/ _ \\ \'_/ -_) \' \\ ', delay: 1650 },
+  { text: ' |___/\\___/_| \\___|_||_|', delay: 1700 },
   { text: '', delay: 1750 },
-  { text: '', delay: 1800 },
-  { text: '', delay: 1850 },
-  { text: 'System ready. Loading interface...', delay: 1900 },
+  { text: 'System ready. Loading interface...', delay: 1800 },
 ]
 
 interface BootSequenceProps {
