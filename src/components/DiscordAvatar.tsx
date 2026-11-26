@@ -63,7 +63,7 @@ export function DiscordAvatar({ profile, size = 42 }: DiscordAvatarProps) {
       </span>
       <img
         className="discord-status-icon"
-        src={`/discord-status/status_${shown}${mobileIcon ? '_mobile' : ''}.png`}
+        src={`${import.meta.env.BASE_URL}discord-status/status_${shown}${mobileIcon ? '_mobile' : ''}.png`}
         alt={label}
         title={label}
       />

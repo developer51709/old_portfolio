@@ -28,12 +28,11 @@ const CLIENT_PLATFORMS = new Set(['github', 'bluesky', 'stackoverflow', 'dev'])
 const SERVER_PLATFORMS = new Set(['youtube', 'x', 'tiktok', 'twitch', 'pinterest', 'spotify'])
 
 /**
- * The EdgeOne Pages edge function is deployed at the same origin. Until it is
- * live (and during `vite dev`, where unknown paths fall back to the SPA shell),
- * fall back to the portfolio's existing API.
+ * The old portfolio's API already aggregates the platforms that block browser
+ * requests. It is CORS-enabled, so the static GitHub Pages build can call it
+ * directly without a same-origin server.
  */
-const SERVER_API = '/api/social-profile'
-const SERVER_API_FALLBACK = 'https://sorenthedev.indevs.in/api/social-profile'
+const SERVER_API = 'https://sorenthedev.indevs.in/api/social-profile'
 
 const asNumber = (value: unknown): number => Number(value ?? 0)
 
@@ -148,16 +147,7 @@ async function fetchDevTo(handle: string): Promise<SocialProfile> {
 
 async function fetchFromServer(platform: string, handle: string): Promise<SocialProfile> {
   const query = `?platform=${encodeURIComponent(platform)}&handle=${encodeURIComponent(handle)}`
-  const edgeResponse = await fetch(`${SERVER_API}${query}`).catch(() => null)
-
-  if (edgeResponse?.ok) {
-    const contentType = edgeResponse.headers.get('content-type') ?? ''
-    if (contentType.includes('application/json')) {
-      return (await edgeResponse.json()) as SocialProfile
-    }
-  }
-
-  const response = await fetch(`${SERVER_API_FALLBACK}${query}`)
+  const response = await fetch(`${SERVER_API}${query}`)
   if (!response.ok) throw new Error(`${platform} profile request failed (${response.status})`)
   return (await response.json()) as SocialProfile
 }
