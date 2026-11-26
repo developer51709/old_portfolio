@@ -1,26 +1,42 @@
 import { useScrollReveal } from '../hooks/useScrollReveal'
+import { useSocialProfile } from '../hooks/useSocialProfile'
+import { DISCORD_PROFILE_URL, type DiscordProfile, type DiscordStatus } from '../utils/discord'
+import { DiscordAvatar } from './DiscordAvatar'
 import { PixelIcon, type PixelIconName } from './PixelIcon'
 
-interface ContactLink {
+interface SocialLink {
+  key: string
   label: string
+  handle?: string
   value: string
+  href: string
   icon: PixelIconName
-  href?: string
 }
 
-const CONTACT_LINKS: ContactLink[] = [
-  { label: 'Discord', value: 'sorenthedev', icon: 'discord' },
-  { label: 'Email', value: 'developer51709@proton.me', icon: 'envelope', href: 'mailto:developer51709@proton.me' },
-  { label: 'GitHub', value: 'github.com/developer51709', icon: 'github', href: 'https://github.com/developer51709' },
-  { label: 'YouTube', value: '@sorenthedev', icon: 'youtube', href: 'https://youtube.com/@sorenthedev' },
-  { label: 'Bluesky', value: 'sorenthedev.bsky.social', icon: 'bluesky', href: 'https://bsky.app/profile/sorenthedev.bsky.social' },
-  { label: 'TikTok', value: '@sorenthedev', icon: 'tiktok', href: 'https://tiktok.com/@sorenthedev' },
-  { label: 'Twitch', value: 'sorenthedev', icon: 'twitch', href: 'https://twitch.tv/sorenthedev' },
-  { label: 'Threads', value: '@sorenthedev', icon: 'threads', href: 'https://threads.net/@sorenthedev' },
-  { label: 'Dev.to', value: 'developer51709', icon: 'globe', href: 'https://dev.to/developer51709' },
+const SOCIAL_LINKS: SocialLink[] = [
+  { key: 'github', label: 'GitHub', handle: 'developer51709', value: '@developer51709', href: 'https://github.com/developer51709', icon: 'github' },
+  { key: 'x', label: 'X', handle: 'sorenthedev', value: '@sorenthedev', href: 'https://x.com/sorenthedev', icon: 'x' },
+  { key: 'youtube', label: 'YouTube', handle: 'sorenthedev', value: '@sorenthedev', href: 'https://youtube.com/@sorenthedev', icon: 'youtube' },
+  { key: 'twitch', label: 'Twitch', handle: 'sorenthedev', value: 'sorenthedev', href: 'https://twitch.tv/sorenthedev', icon: 'twitch' },
+  { key: 'tiktok', label: 'TikTok', handle: 'sorenthedev', value: '@sorenthedev', href: 'https://tiktok.com/@sorenthedev', icon: 'tiktok' },
+  { key: 'pinterest', label: 'Pinterest', handle: 'sorenthedev', value: '@sorenthedev', href: 'https://pinterest.com/sorenthedev', icon: 'pinterest' },
+  { key: 'bluesky', label: 'Bluesky', handle: 'sorenthedev.bsky.social', value: 'sorenthedev.bsky.social', href: 'https://bsky.app/profile/sorenthedev.bsky.social', icon: 'bluesky' },
+  { key: 'spotify', label: 'Spotify', handle: '31kc6tv66sgkold3ojvlnyejkbn4', value: 'Soren', href: 'https://open.spotify.com/user/31kc6tv66sgkold3ojvlnyejkbn4', icon: 'music' },
+  { key: 'dev', label: 'Dev.to', handle: 'developer51709', value: '@developer51709', href: 'https://dev.to/developer51709', icon: 'code' },
+  { key: 'stackoverflow', label: 'Stack Overflow', handle: '32959452', value: '@Soren', href: 'https://stackoverflow.com/users/32959452/soren', icon: 'comment' },
+  { key: 'threads', label: 'Threads', value: '@sorenthedev', href: 'https://threads.net/@sorenthedev', icon: 'threads' },
+  { key: 'phone', label: 'Phone', value: '+1 (762) 435-4135', href: 'tel:+17624354135', icon: 'phone' },
+  { key: 'email', label: 'Email', value: 'developer51709@proton.me', href: 'mailto:developer51709@proton.me', icon: 'envelope' },
 ]
 
-export function Contact() {
+const STATUS_LABELS: Record<DiscordStatus, string> = {
+  online: 'Online',
+  idle: 'Idle',
+  dnd: 'Do Not Disturb',
+  offline: 'Offline',
+}
+
+export function Contact({ discord }: { discord: DiscordProfile | null }) {
   const { ref, isVisible } = useScrollReveal()
 
   return (
@@ -41,48 +57,65 @@ export function Contact() {
         Feel free to reach out — I'm always open to conversations about tech, projects, or collaboration.
       </p>
       <div className="contact-grid">
-        {CONTACT_LINKS.map((link) => (
-          <ContactCard key={link.label} {...link} />
+        <DiscordCard discord={discord} />
+        {SOCIAL_LINKS.map((social) => (
+          <SocialCard key={social.key} social={social} enabled={isVisible} />
         ))}
       </div>
     </div>
   )
 }
 
-function ContactCard({ label, value, icon, href }: ContactCardProps) {
-  const content = (
-    <div className="contact-card">
-      <PixelIcon name={icon} size={28} style={{ color: '#00ff00', flexShrink: 0 }} />
-      <div>
-        <div style={{ color: 'rgba(0,255,0,0.5)', fontSize: '0.75rem', letterSpacing: '1px', textTransform: 'uppercase', marginBottom: '0.25rem' }}>
-          {label}
-        </div>
-        <div style={{ color: '#e0e0e0', fontSize: '0.9rem', wordBreak: 'break-all' }}>
-          {value}
-        </div>
-      </div>
-    </div>
+function DiscordCard({ discord }: { discord: DiscordProfile | null }) {
+  const status = discord
+    ? discord.streaming
+      ? 'Streaming'
+      : STATUS_LABELS[discord.status]
+    : null
+
+  return (
+    <a className="social-card" href={DISCORD_PROFILE_URL} target="_blank" rel="noopener noreferrer">
+      <span className="social-card-avatar">
+        {discord ? (
+          <DiscordAvatar profile={discord} size={42} />
+        ) : (
+          <PixelIcon name="discord" size={26} style={{ color: '#00ff00' }} />
+        )}
+      </span>
+      <span className="social-card-body">
+        <span className="social-card-label">Discord</span>
+        <span className="social-card-value">{discord ? `@${discord.username}` : 'view profile'}</span>
+        {discord && status && (
+          <span className={`social-card-stats discord-presence is-${discord.streaming ? 'streaming' : discord.status}`}>
+            {status}
+          </span>
+        )}
+      </span>
+    </a>
   )
-
-  if (href) {
-    return (
-      <a
-        href={href}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="contact-card-link"
-      >
-        {content}
-      </a>
-    )
-  }
-
-  return content
 }
 
-interface ContactCardProps {
-  label: string
-  value: string
-  icon: PixelIconName
-  href?: string
+function SocialCard({ social, enabled }: { social: SocialLink; enabled: boolean }) {
+  const { profile } = useSocialProfile(social.key, social.handle ?? '', enabled && Boolean(social.handle))
+  const stats = profile?.stats ?? []
+
+  return (
+    <a className="social-card" href={profile?.profileUrl ?? social.href} target="_blank" rel="noopener noreferrer">
+      <span className="social-card-icon">
+        <PixelIcon name={social.icon} size={26} style={{ color: '#00ff00' }} />
+      </span>
+      <span className="social-card-body">
+        <span className="social-card-label">{social.label}</span>
+        <span className="social-card-value">{profile?.handle ?? social.value}</span>
+        {stats.length > 0 && (
+          <span className="social-card-stats">
+            {stats
+              .slice(0, 3)
+              .map((stat) => `${stat.display ?? stat.value.toLocaleString()} ${stat.label.toLowerCase()}`)
+              .join(' · ')}
+          </span>
+        )}
+      </span>
+    </a>
+  )
 }

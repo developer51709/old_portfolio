@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 const BOOT_LINES = [
   { text: 'BIOS v2.04 — developer51709 systems', delay: 0 },
@@ -24,8 +24,19 @@ interface BootSequenceProps {
 export function BootSequence({ onComplete }: BootSequenceProps) {
   const [visibleLines, setVisibleLines] = useState<string[]>([])
   const [fadeOut, setFadeOut] = useState(false)
+  const onCompleteRef = useRef(onComplete)
 
   useEffect(() => {
+    onCompleteRef.current = onComplete
+  }, [onComplete])
+
+  // Runs once per mount. The parent re-renders while the boot animation plays
+  // (the Discord profile resolves during it), so the sequence must not restart
+  // and reprint lines that are already on screen.
+  useEffect(() => {
+    setVisibleLines([])
+    setFadeOut(false)
+
     const timers: ReturnType<typeof setTimeout>[] = []
 
     BOOT_LINES.forEach(({ text, delay }) => {
@@ -43,11 +54,11 @@ export function BootSequence({ onComplete }: BootSequenceProps) {
 
     // Complete after fade
     timers.push(
-      setTimeout(() => onComplete(), 3200)
+      setTimeout(() => onCompleteRef.current(), 3200)
     )
 
     return () => timers.forEach(clearTimeout)
-  }, [onComplete])
+  }, [])
 
   return (
     <div

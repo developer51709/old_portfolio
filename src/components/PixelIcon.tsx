@@ -15,6 +15,10 @@ import {
   Linkedin,
   X,
   GlobeAmericas,
+  MusicSolid,
+  Pinterest,
+  CodeSolid,
+  PhoneRingingHighSolid,
 } from '@2hoch1/pixel-icon-library-react'
 
 const ICON_MAP = {
@@ -34,6 +38,10 @@ const ICON_MAP = {
   'linkedin': Linkedin,
   'x': X,
   'globe': GlobeAmericas,
+  'music': MusicSolid,
+  'pinterest': Pinterest,
+  'code': CodeSolid,
+  'phone': PhoneRingingHighSolid,
 } as const
 
 export type PixelIconName = keyof typeof ICON_MAP
